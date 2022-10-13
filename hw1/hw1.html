@@ -1,0 +1,116 @@
+<html>
+<head>
+<style>
+img.word-icon {
+  content: url(https://i.imgur.com/W38GYJe.png);
+  width: 250px;
+  height: 400px;
+}
+</style>
+</head>
+<body>
+<!-- 
+https://stackoverflow.com/questions/38014918/how-to-reuse-base64-image-repeatedly-in-html-file
+-->
+<h1> Homework 1: Xmas Lights with HTML & CSS
+</h1>
+<button id="power">Power</button>
+<!-- <button id="mode">ChangeMode</button>-->
+<br>
+
+<img class="word-icon">
+<div id="bkgd" style="position:absolute; top: 300px; left: 100px; width:300px; height: 50px">
+
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script>
+var powerOn = true;
+var modeOn = true;
+
+$('#power').click (function() {
+  powerOn = !powerOn;
+  
+  if (powerOn === true) {  // false--> true
+     lamps.forEach (function(item) {item.startBlink();});
+  }
+});
+/*$('#mode').click (function() {
+  modeOn = !modeOn;
+  if (modeOn === true) {  // false--> true
+    lamps.forEach (function(item) {item.update();});
+  }
+});*/
+
+class Lamp {
+
+  constructor(name) {
+    this.name = name + Lamp.id++;
+    this.myStatus = false;
+    
+    let el = document.createElement ('div');
+    el.id = this.name;
+    //let text = document.createTextNode (name + ' is OFF');
+    //el.appendChild(text);
+    let bkgd = document.getElementById('bkgd');
+    bkgd.appendChild(el);
+    this.hue = Math.random()*360;
+    this.tim = Math.random()*1000 + 1000;
+    // styles
+    el.setAttribute ("style", `background-color: hsl(${this.hue}, 90%, 50%); width:10%; height:60%; border-radius:100%;`);
+    el.style.position = "absolute";
+    el.style.left = 100 + '%'; 
+    el.style.top = 100 + '%';
+  }
+
+  toggle() {
+    this.myStatus = ! this.myStatus;
+    
+    if (powerOn) {
+       setTimeout (()=>{this.toggle();}, this.tim);
+    }
+    if (!powerOn) this.myStatus = false;
+    if (this.myStatus === true) {
+      $('#'+this.name).css('backgroundColor', `hsl(${this.hue},90%,80%)`);
+      //$('#'+this.name).text(this.name);
+    } else {
+      $('#'+this.name).css('backgroundColor', `hsl(${this.hue},90%,24%)`);
+      //$('#'+this.name).text(this.name);
+    }
+  }
+
+  startBlink() {
+    var that = this;
+/*   
+    setInterval(function() {
+      that.toggle();
+    }, 500);
+*/
+   setTimeout (()=>{ this.toggle(); }, 0);
+     
+    //setInterval (that.toggle, 500);   // somehow, it does not work
+  }
+  
+  /*update(check){
+    if(check) setTimeout (()=>{ this.toggle(); }, 0);
+	else setTimeout (()=>{ this.toggle(); }, 0);
+  }*/
+}
+
+Lamp.id = 0; // class variable
+lamps = [];
+
+for (let i = 0; i < 5; i++) {
+   let ll = new Lamp ('light');
+   lamps.push (ll);
+}
+
+lamps.forEach ( function(ll) {ll.startBlink();} );
+$('#light0').css({"top":"-120%", "left":"10%"});
+$('#light1').css({"top":"40%", "left":"20%"});
+$('#light2').css({"top":"90%", "left":"-10%"});
+$('#light3').css({"top":"-180%", "left":"0%"});
+$('#light4').css({"top":"30%", "left":"-20%"});
+
+</script>
+</body>
+</html>
