@@ -15,7 +15,7 @@ https://stackoverflow.com/questions/38014918/how-to-reuse-base64-image-repeatedl
 <h1> Homework 1: Xmas Lights with HTML & CSS
 </h1>
 <button id="power">Power</button>
-<!-- <button id="mode">ChangeMode</button>-->
+<button id="mode">ChangeMode</button>
 <br>
 
 <img class="word-icon">
@@ -26,7 +26,6 @@ https://stackoverflow.com/questions/38014918/how-to-reuse-base64-image-repeatedl
 <script>
 var powerOn = true;
 var modeOn = true;
-
 $('#power').click (function() {
   powerOn = !powerOn;
   
@@ -34,12 +33,11 @@ $('#power').click (function() {
      lamps.forEach (function(item) {item.startBlink();});
   }
 });
-/*$('#mode').click (function() {
+$('#mode').click (function() {
   modeOn = !modeOn;
-  if (modeOn === true) {  // false--> true
-    lamps.forEach (function(item) {item.update();});
-  }
-});*/
+  lamps.forEach (function(item) {item.update();});
+
+});
 
 class Lamp {
 
@@ -54,7 +52,9 @@ class Lamp {
     let bkgd = document.getElementById('bkgd');
     bkgd.appendChild(el);
     this.hue = Math.random()*360;
-    this.tim = Math.random()*1000 + 1000;
+    this.timRam = Math.random()*1000 + 1000;
+	this.timRegu = 500;
+	this.tim = this.timRam;
     // styles
     el.setAttribute ("style", `background-color: hsl(${this.hue}, 90%, 50%); width:10%; height:60%; border-radius:100%;`);
     el.style.position = "absolute";
@@ -90,10 +90,10 @@ class Lamp {
     //setInterval (that.toggle, 500);   // somehow, it does not work
   }
   
-  /*update(check){
-    if(check) setTimeout (()=>{ this.toggle(); }, 0);
-	else setTimeout (()=>{ this.toggle(); }, 0);
-  }*/
+  update(){
+    if(modeOn) this.tim=this.timRam;
+	else this.tim=this.timRegu;
+  }
 }
 
 Lamp.id = 0; // class variable
