@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<style>
+table{
+  border: 3px ridge black;
+  border-color: #66B3FF;
+  background-color: #D6D6AD;
+  border-radius: 50px;
+  text-align:center;
+}
+td{
+  font-size:32px;
+}
+input{
+  width:80%;
+  height:50%;
+}
+#output{
+  border: 1px black solid; 
+  background-color:white; 
+  width:80%;
+  height:5%;
+}
+
+h1{
+	font-size:40px;
+	text-align:center;
+}
+
+</style>
+<body>
+<h1>Homework 2: HTML Input & Vector3 API</h1>
+<table style = "position : absolute; left:20%; top: 10%; width:30%; height:32.5%">
+  <tr>
+    <td>V</td>
+  </tr>
+  <tr>
+    <td>x</td>
+	<td><input type="number" id ="Vx"></input></td>
+  </tr>
+  <tr>
+    <td>y</td>
+	<td><input type="number" id ="Vy"></input></td>
+  </tr>
+  <tr>
+    <td>z</td>
+	<td><input type="number" id ="Vz"></input></td>
+  </tr>
+</table>
+<table style = "position : absolute; left:20%; top: 55%; width:30%; height:32.5%">
+  <tr>
+    <td>W</td>
+  </tr>
+  <tr>
+    <td>x</td>
+	<td><input type="number" id ="Wx"></input></td>
+  </tr>
+  <tr>
+    <td>y</td>
+	<td><input type="number" id ="Wy"></input></td>
+  </tr>
+  <tr>
+    <td>z</td>
+	<td><input type="number" id ="Wz"></input></td>
+  </tr>
+</table>
+<table style ="position : absolute; left:55%; top: 10%; width:35%; height:80%">
+  <tr>
+    <td>inner product</td>
+  </tr>
+  <tr>
+    <td>v&#8901;w</td>
+	<td id = "output" ><h4 id="innerProduct"></h4></td>
+  </tr>
+  <tr>
+	<td>v&Cross;w(Vector product)</td>
+  </tr>
+    <td>x</td>
+	<td id = "output"><h4 id="vecAnsX"></h4></td>
+  <tr>
+  </tr>
+    <td>y</td>
+	<td id = "output"><h4 id="vecAnsY"></h4></td>
+  <tr>
+    <td>z</td>
+	<td id = "output"><h4 id="vecAnsZ"></h4></td>
+  </tr>
+</table>
+</div>
+<script src="https://threejs.org/build/three.min.js"></script>
+<script>
+
+animate();
+function animate() {
+  let VectorV = new THREE.Vector3();
+  VectorV.x = +document.getElementById("Vx").value;
+  VectorV.y = +document.getElementById("Vy").value;
+  VectorV.z = +document.getElementById("Vz").value;  
+  let VectorW = new THREE.Vector3();
+  VectorW.x = +document.getElementById("Wx").value;
+  VectorW.y = +document.getElementById("Wy").value;
+  VectorW.z = +document.getElementById("Wz").value;
+  
+  document.getElementById("innerProduct").innerHTML = VectorV.x * VectorW.x + VectorV.y * VectorW.y + VectorV.z * VectorW.z;
+  document.getElementById("vecAnsX").innerHTML = Math.abs(VectorV.y * VectorW.z - VectorV.z * VectorW.y);
+  document.getElementById("vecAnsY").innerHTML = Math.abs(VectorV.z * VectorW.x - VectorV.x * VectorW.z);
+  document.getElementById("vecAnsZ").innerHTML = Math.abs(VectorV.x * VectorW.y - VectorV.y * VectorW.x);
+
+  requestAnimationFrame(animate);
+}
+
+</script>
+</body>
+</html>
