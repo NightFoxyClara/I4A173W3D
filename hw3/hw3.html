@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+	#info {
+		position: absolute;
+		top: 10px; width: 100%;
+		
+		padding: 5px;
+		text-align: center;
+		font-size: 20px;
+		color: #ffffff
+	} 
+	body {
+		overflow: hidden
+  }
+</style>
+
+
+</head>
+
+<body>
+
+<div id='info'><a href="https://i.imgur.com/d9JrSsQ.png">室內設計模型 (1)</a><br>
+<button id="power">Power</button>
+<button id="mode">Change ViewPoint</button></div>
+<script src="https://threejs.org/build/three.min.js"></script>
+<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<script>
+var controls;
+var powerOn = true;
+var mode = 0;
+var LightGroup = [];
+$('#power').click (function() {
+  powerOn = !powerOn;
+  
+  if (powerOn === true) {  // false--> true
+     LightGroup.forEach (function(item) {
+		item.power = 4;
+		}
+	 );
+  }
+  else{
+	LightGroup.forEach (function(item) {
+		item.power = 0;
+	}
+	);
+  }
+});
+
+$('#mode').click (function() {
+  if(mode != 3) mode = mode + 1 
+  else mode = 0
+  
+  
+  if (mode === 0) {  // false--> true
+     camera.position.y = 16;
+	 camera.position.z = 40;
+	 camera.lookAt (new THREE.Vector3(0,0,0));
+  }
+  else if(mode === 1) {
+	 camera.position.set(0,2,9)
+	 camera.lookAt (new THREE.Vector3(0,0,0));
+  }
+  else if(mode === 2) {
+	 camera.position.set(-10,2,7)
+	 camera.lookAt (new THREE.Vector3(0,0,0));
+  }
+  else if(mode === 3) {
+	 camera.position.set(3,2,-6)
+	 camera.lookAt (new THREE.Vector3(0,3,-8));
+  }
+  
+  let temp = camera.position.clone()
+  if(mode != 0) temp.z += 2
+  else temp.set(0,0,0)
+  
+  controls.target.copy(temp)
+  controls.update();
+});
+
+class Stair{
+	constructor (l, w, texture){
+		var mesh1 = new THREE.Mesh(new THREE.BoxGeometry (l,1,w), new THREE.MeshPhongMaterial({map:texture,side:THREE.DoubleSide}));
+		mesh1.position.y = 0.5
+		mesh1.rotation.y = -Math.PI;
+		scene.add(mesh1)
+		var mesh2 = new THREE.Mesh(new THREE.BoxGeometry (l,2,w), new THREE.MeshPhongMaterial({map:texture,side:THREE.DoubleSide}));
+		mesh2.position.y = 0.5
+		mesh2.position.z = w*1
+		mesh1.add(mesh2)
+		var mesh3 = new THREE.Mesh(new THREE.BoxGeometry (l,3,w), new THREE.MeshPhongMaterial({map:texture,side:THREE.DoubleSide}));
+		mesh3.position.y = 1
+		mesh3.position.z = w*2
+		mesh1.add(mesh3)
+		var mesh4 = new THREE.Mesh(new THREE.BoxGeometry (l,4,w), new THREE.MeshPhongMaterial({map:texture,side:THREE.DoubleSide}));
+		mesh4.position.y = 1.5
+		mesh4.position.z = w*3
+		mesh1.add(mesh4)
+		var mesh5 = new THREE.Mesh(new THREE.BoxGeometry (l,5,w), new THREE.MeshPhongMaterial({map:texture,side:THREE.DoubleSide}));
+		mesh5.position.y = 2
+		mesh5.position.z = w*4
+		mesh1.add(mesh5)
+		return mesh1;
+  }
+}
+
+class PictureFrame{
+	constructor (l, w, texture, ftexture){
+		var mesh1 = new THREE.Mesh(new THREE.PlaneGeometry(l,w), new THREE.MeshPhongMaterial({map:texture,side:THREE.DoubleSide}));
+		scene.add(mesh1)
+		/*var mesh2 = new THREE.Mesh(new THREE.BoxGeometry (l+1*(w+l)/2/5,0.5*(w+l)/2/5,0.5*(w+l)/2/5), new THREE.MeshPhongMaterial({map:ftexture,side:THREE.DoubleSide}));
+		mesh2.position.y += 0.5*w
+		mesh1.add(mesh2)
+		var mesh3 = new THREE.Mesh(new THREE.BoxGeometry (l+1*(w+l)/2/5,0.5*(w+l)/2/5,0.5*(w+l)/2/5), new THREE.MeshPhongMaterial({map:ftexture,side:THREE.DoubleSide}));
+		mesh3.position.y -= 0.5*w
+		mesh1.add(mesh3)
+		var mesh4 = new THREE.Mesh(new THREE.BoxGeometry (0.5*(w+l)/2/5,w-0.5*(w+l)/2/5,0.5*(w+l)/2/5), new THREE.MeshPhongMaterial({map:ftexture,side:THREE.DoubleSide}));
+		mesh4.position.x += 0.5*l+0.25*l/5
+		mesh1.add(mesh4)
+		var mesh5 = new THREE.Mesh(new THREE.BoxGeometry (0.5*(w+l)/2/5,w-0.5*(w+l)/2/5,0.5*(w+l)/2/5), new THREE.MeshPhongMaterial({map:ftexture,side:THREE.DoubleSide}));
+		mesh5.position.x -= 0.5*l+0.25*l/5
+		mesh1.add(mesh5)*/
+		var mesh6 = new THREE.Mesh(new THREE.PlaneGeometry(l,w), new THREE.MeshPhongMaterial({map:ftexture,side:THREE.DoubleSide,transparent:true}));
+		mesh6.position.z = 0
+		mesh1.add(mesh6)
+		return mesh1;
+  }
+}
+
+class Chair{
+	constructor (l, h, w, texture){
+		var mesh1 = new THREE.Mesh(new THREE.BoxGeometry(l,0.2*h,w), new THREE.MeshPhongMaterial({map:texture,side:THREE.DoubleSide}));
+		scene.add(mesh1)
+		var mesh6 = new THREE.Mesh(new THREE.BoxGeometry(0.2*h,h,w), new THREE.MeshPhongMaterial({map:texture,side:THREE.DoubleSide,transparent:true}));
+		mesh6.position.x = 0.5*l - 0.1*h
+		mesh6.position.y -= 0.5*h
+		mesh1.add(mesh6)
+		var mesh7 = new THREE.Mesh(new THREE.BoxGeometry(0.2*h,h,w), new THREE.MeshPhongMaterial({map:texture,side:THREE.DoubleSide,transparent:true}));
+		mesh7.position.x = -0.5*l + 0.1*h
+		mesh7.position.y -= 0.5*h
+		mesh1.add(mesh7)
+		return mesh1;
+  }
+}
+
+/*class LampLight{
+	constructor (l, w, h, texture){
+		var mesh1 = new THREE.Mesh(new THREE.CylinderGeometry(l/2,w/2,h,32,32), new THREE.MeshBasicMaterial({map:texture,side:THREE.DoubleSide}));
+		mesh1.rotation.x = -0.5*Math.PI;
+		var lampGroup = new THREE.Group();
+		lampGroup.add(mesh1, new THREE.AxesHelper (40))
+		scene.add(lampGroup)
+		
+		//var light1 = new THREE.SpotLight( 0xffffff );
+		//light1.position.z += h
+		//light1.rotation.x = -0.5*Math.PI;
+		//mesh1.add(light1)
+		
+		return mesh1;
+  }
+}*/
+
+function MakeWall(l, h, w, texture){
+	var cubeGeometry = new THREE.BoxGeometry (l,h,w);
+	var cubeMaterial = new THREE.MeshPhongMaterial({map: texture, transparent: true, side:THREE.DoubleSide});
+	cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+	scene.add(cube);
+	return cube;
+}
+
+function MakeFlatWall(l, w, texture){
+	var cubeGeometry = new THREE.PlaneGeometry(l,w);
+	var cubeMaterial = new THREE.MeshPhongMaterial({map: texture, transparent: true, side:THREE.DoubleSide});
+	cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+	scene.add(cube);
+	return cube;
+}
+
+function onWindowResize() {
+  var width = window.innerWidth;
+  var height = window.innerHeight;
+  camera.aspect = width / height;
+  camera.updateProjectionMatrix();
+  renderer.setSize(width, height);
+}
+
+function BuildLight(x,y,z,target,texture){
+	const spotlight = new THREE.SpotLight(0xffffff, 0.5, 7, Math.PI/6, 0.75);
+	LightGroup.push(spotlight)
+	scene.add(spotlight)
+	spotlight.target = target	
+	var mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.2/2,0.5/2,0.5,32,32), new THREE.MeshBasicMaterial({map:texture,side:THREE.DoubleSide}));
+	mesh.rotation.x = -0.5*Math.PI;
+	var lampGroup = new THREE.Group();
+	lampGroup.add(mesh)
+	scene.add(lampGroup)
+	lampGroup.position.set(x,y,z)
+	spotlight.position.copy(lampGroup.position)
+	lampGroup.lookAt(target.position)
+	return lampGroup;
+}
+
+function BuildSphereLight(x,y,z,texture){
+	const light = new THREE.PointLight(0xffffff, 0.75, 25 );
+	LightGroup.push(light)
+	scene.add(light)
+	var mesh = new THREE.Mesh(new THREE.SphereGeometry(0.2,32), new THREE.MeshBasicMaterial({map:texture,side:THREE.DoubleSide}));
+	mesh.position.set(x,y,z)
+	scene.add(mesh)
+	light.position.copy(mesh.position)
+	return mesh;
+}
+
+init();
+animate();
+
+function init () {
+  
+	renderer = new THREE.WebGLRenderer();
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.setClearColor(0x7B7B7B	);
+	document.body.appendChild(renderer.domElement);
+
+	var width = window.innerWidth;
+	var height = window.innerHeight;
+	renderer.setSize (width, height);
+
+	scene = new THREE.Scene();
+	var grid = new THREE.GridHelper(50,50);
+	grid.position.y=0.01
+	//scene.add (grid);
+	var axes = new THREE.AxesHelper (5);
+	//scene.add (axes);
+	
+	camera = new THREE.PerspectiveCamera (35, width/height, 1, 10000);
+	camera.position.y = 16;
+	camera.position.z = 40;
+	camera.lookAt (new THREE.Vector3(0,0,0));
+	
+	controls = new THREE.OrbitControls(camera, renderer.domElement);
+	window.addEventListener('resize', onWindowResize, false)
+	
+	var loader = new THREE.TextureLoader();
+	loader.setCrossOrigin('');
+	var marbletexture = loader.load ('https://i.imgur.com/aXxBvRk.jpg');
+	var woodtexture = loader.load ('https://i.imgur.com/KOlWVIE.jpg');
+	var irontexture = loader.load ('https://i.imgur.com/RFsaLOV.jpg');
+	var frametexture = loader.load ('https://i.imgur.com/F63Y1ZY.png');
+	var maletexture = loader.load ('https://i.imgur.com/gJWwvsk.png');
+	var femaletexture = loader.load ('https://i.imgur.com/FE7S5XQ.png');
+	var signtexture = loader.load ('https://i.imgur.com/YJQ8Tgu.jpg');
+	var bgtexture = loader.load ('https://i.imgur.com/JCOjvLj.png');
+	
+	var clarapicture1 = loader.load ('https://i.imgur.com/2DePcFp.png');
+	var clarapicture2 = loader.load ('https://i.imgur.com/TOWmSwI.png')
+	var clarapicture3 = loader.load ('https://i.imgur.com/S40Aj26.png')
+	var clarapicture4 = loader.load ('https://i.imgur.com/om9C2LX.png')
+	var clarapicture5 = loader.load ('https://i.imgur.com/q0BqDHK.png')
+	var clarapicture6 = loader.load ('https://i.imgur.com/fvTj1PL.png')
+	var clarapicture7 = loader.load ('https://i.imgur.com/uRPY6tG.png')
+	
+	var aitouchipicture1 = loader.load ('https://i.imgur.com/OyWBELo.jpg');
+	var aitouchipicture2 = loader.load ('https://i.imgur.com/F7E5VB6.png')
+	var aitouchipicture3 = loader.load ('https://i.imgur.com/lQ9NOt3.jpg')
+	var aitouchipicture4 = loader.load ('https://i.imgur.com/QRbssoV.jpg')
+	var aitouchipicture5 = loader.load ('https://i.imgur.com/jy4v8Ek.png')
+	var aitouchipicture6 = loader.load ('https://i.imgur.com/Wzuwf5D.jpg')
+	var aitouchipicture7 = loader.load ('https://i.imgur.com/y52OB81.jpg')
+	pointlight1 = new THREE.DirectionalLight( 0xffffff, 0.2 );
+	pointlight1.position.set(0, 25, 0);
+	scene.add( pointlight1 );
+	
+	pointlight2 = new THREE.DirectionalLight( 0xffffff, 0.2 );
+	pointlight2.position.set(25, 25, 0);
+	scene.add( pointlight2 );
+	
+	pointlight3 = new THREE.DirectionalLight( 0xffffff, 0.2 );
+	pointlight3.position.set(-25, 25, 0);
+	scene.add( pointlight3 );
+	
+	pointlight4 = new THREE.DirectionalLight( 0xffffff, 0.2 );
+	pointlight4.position.set(0, 25, 25);
+	scene.add( pointlight4 );
+	
+	pointlight5 = new THREE.DirectionalLight( 0xffffff, 0.2 );
+	pointlight5.position.set(0, 25, -25);
+	scene.add( pointlight5 );
+
+	var floor = MakeFlatWall(70,70,woodtexture);
+	floor.rotation.x = -Math.PI/2;
+	var Fwall1 = MakeFlatWall(40,5,marbletexture);
+	Fwall1.position.set(5,2.5,15)
+	var Fwall2 = MakeFlatWall(40,5,marbletexture);
+	Fwall2.position.set(5,2.5,-15);
+	var Fwall3 = MakeFlatWall(30,5,marbletexture);
+	Fwall3.rotation.y = -Math.PI/2;
+	Fwall3.position.set(-15.0001,2.5,0)
+	var Fwall41 = MakeFlatWall(30,2,marbletexture);
+	Fwall41.rotation.y = -Math.PI/2;
+	Fwall41.position.set(25,4,0)
+	var Fwall42 = MakeFlatWall(11,3,marbletexture);
+	Fwall42.rotation.y = -Math.PI/2;
+	Fwall42.position.set(25,1.5,9.5)
+	var Fwall43 = MakeFlatWall(13,3,marbletexture);
+	Fwall43.rotation.y = -Math.PI/2;
+	Fwall43.position.set(25,1.5,-4.5)
+	var Fwall44 = MakeFlatWall(2,3,marbletexture);
+	Fwall44.rotation.y = -Math.PI/2;
+	Fwall44.position.set(25,1.5,-14)
+	var Fwall4 = []
+	Fwall4.push(Fwall41,Fwall42,Fwall43,Fwall44);
+	var Fwall51 = MakeFlatWall(30,2,marbletexture);
+	Fwall51.rotation.y = -Math.PI/2;
+	Fwall51.position.set(15.01,4,0)
+	var Fwall52 = MakeFlatWall(2,3,marbletexture);
+	Fwall52.rotation.y = -Math.PI/2;
+	Fwall52.position.set(15.01,1.5,14)
+	var Fwall53 = MakeFlatWall(13,3,marbletexture);
+	Fwall53.rotation.y = -Math.PI/2;
+	Fwall53.position.set(15.01,1.5,4.5)
+	var Fwall54 = MakeFlatWall(11,3,marbletexture);
+	Fwall54.rotation.y = -Math.PI/2;
+	Fwall54.position.set(15.01,1.5,-9.5)
+	var Fwall5 = []
+	Fwall5.push(Fwall51,Fwall52,Fwall53,Fwall54);
+	
+	wall1=MakeWall(8, 5, 1,marbletexture);
+	wall1.position.set(-11,2.5,0)
+	wall2=MakeWall(10, 5, 1,marbletexture);
+	wall2.rotation.y = -Math.PI/2;
+	wall2.position.set(-7.5,2.5,10)
+	wall3=MakeWall(10, 5, 1,marbletexture);
+	wall3.rotation.y = -Math.PI/2;
+	wall3.position.set(-7.5,2.5,-10)
+	wall4=MakeWall(8, 5, 1,marbletexture);
+	wall4.position.set(0,2.5,5.5)
+	wall5=MakeWall(10, 5, 1,marbletexture);
+	wall5.rotation.y = -Math.PI/2;
+	wall5.position.set(4.5,2.5,10)
+	wall6=MakeWall(29, 5, 1,marbletexture);
+	wall6.position.set(10.5,2.5,0)
+	wall7=MakeWall(6, 5, 1,marbletexture);
+	wall7.position.set(-4,2.5,-7.5)
+	wall8=MakeWall(8, 5, 1,marbletexture);
+	wall8.rotation.y = -Math.PI/2;
+	wall8.position.set(0.5,2.5,-11)
+	wall9=MakeWall(6, 5, 1,marbletexture);
+	wall9.position.set(5,2.5,-7.5)
+	wall10=MakeWall(10, 5, 1,marbletexture);
+	wall10.rotation.y = -Math.PI/2;
+	wall10.position.set(8.5,2.5,-10)
+
+	stair1 = new Stair(6, 1, woodtexture)
+	stair1.position.set(12,0.5,-5.5)
+	stair2 = new Stair(7, 1, woodtexture)
+	stair2.position.set(-11.5,0.5,-5.5)
+	
+	sign1 = new THREE.Mesh(new THREE.PlaneGeometry(0.5,1), new THREE.MeshPhongMaterial({map:maletexture,side:THREE.DoubleSide}));
+	sign1.position.set(-1.5,4,-6.99)
+	scene.add(sign1)
+	sign2 = new THREE.Mesh(new THREE.PlaneGeometry(0.5,1), new THREE.MeshPhongMaterial({map:femaletexture,side:THREE.DoubleSide}));
+	sign2.position.set(2.5,4,-6.99)
+	scene.add(sign2)
+	sign3 = new THREE.Mesh(new THREE.PlaneGeometry(3,3), new THREE.MeshPhongMaterial({map:signtexture,side:THREE.DoubleSide}));
+	sign3.position.set(5.1,2.5,12)
+	sign3.rotation.y = Math.PI/2;
+	scene.add(sign3)
+	sign4 = new THREE.Mesh(new THREE.PlaneGeometry(10,5), new THREE.MeshPhongMaterial({map:bgtexture,side:THREE.DoubleSide}));
+	sign4.position.set(10,2.5,0.511)
+	scene.add(sign4)
+	sign5 = new THREE.Mesh(new THREE.PlaneGeometry(10,5), new THREE.MeshPhongMaterial({map:bgtexture,side:THREE.DoubleSide}));
+	sign5.position.set(1,2.5,0.51)
+	scene.add(sign5)
+	sign6 = new THREE.Mesh(new THREE.PlaneGeometry(10,5), new THREE.MeshPhongMaterial({map:bgtexture,side:THREE.DoubleSide}));
+	sign6.position.set(10,2.5,-0.511)
+	sign6.rotation.y = Math.PI
+	scene.add(sign6)
+	sign7 = new THREE.Mesh(new THREE.PlaneGeometry(10,5), new THREE.MeshPhongMaterial({map:bgtexture,side:THREE.DoubleSide}));
+	sign7.position.set(1,2.5,-0.51)
+	sign7.rotation.y = Math.PI
+	scene.add(sign7)
+	
+	chair1 = new Chair(2,1,1,woodtexture)
+	chair1.position.set(-2.5,1,-6.5)
+	chair2 = new Chair(2,1,1,woodtexture)
+	chair2.position.set(-5.5,1,-6.5)
+	chair3 = new Chair(2,1,1,woodtexture)
+	chair3.position.set(3.5,1,-6.5)
+	chair4 = new Chair(2,1,1,woodtexture)
+	chair4.position.set(6.5,1,-6.5)
+	
+	slight1 = BuildSphereLight(20,7,0,marbletexture)
+	slight2 = BuildSphereLight(4.5,7,5.5,marbletexture)
+	slight3 = BuildSphereLight(8.5,7,-7.5,marbletexture)
+	slight4 = BuildSphereLight(-7.5,7,5.5,marbletexture)
+	slight5 = BuildSphereLight(-7.5,7,-7.5,marbletexture)
+	
+	var sline1 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(sline1)
+	sline1.position.set(slight1.position.x,slight1.position.y+1,slight1.position.z)
+	var sline2 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(sline2)
+	sline2.position.set(slight2.position.x,slight2.position.y+1,slight2.position.z)
+	var sline3 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(sline3)
+	sline3.position.set(slight3.position.x,slight3.position.y+1,slight3.position.z)
+	var sline4 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(sline4)
+	sline4.position.set(slight4.position.x,slight4.position.y+1,slight4.position.z)
+	var sline5 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(sline5)
+	sline5.position.set(slight5.position.x,slight5.position.y+1,slight5.position.z)
+	
+	pictureframe1 = new PictureFrame(2,2,clarapicture1,frametexture);
+	pictureframe1.position.set(-2,2.5,6.1)
+	pictureframe2 = new PictureFrame(2,2,clarapicture2,frametexture);
+	pictureframe2.position.set(2,2.5,6.1)
+	pictureframe3 = new PictureFrame(4,2,clarapicture3,frametexture);
+	pictureframe3.position.set(3.9,2.5,10.5)
+	pictureframe3.rotation.y=-0.5*Math.PI
+	pictureframe4 = new PictureFrame(2,2,clarapicture4,frametexture);
+	pictureframe4.position.set(2,2.5,14.9)
+	pictureframe4.rotation.y=Math.PI
+	pictureframe5 = new PictureFrame(2,2,clarapicture5,frametexture);
+	pictureframe5.position.set(-1,2.5,14.9)
+	pictureframe5.rotation.y=Math.PI
+	pictureframe6 = new PictureFrame(2,2,clarapicture6,frametexture);
+	pictureframe6.position.set(-4,2.5,14.9)
+	pictureframe6.rotation.y=Math.PI
+	pictureframe7 = new PictureFrame(5,4,clarapicture7,frametexture);
+	pictureframe7.position.set(-6.9,2.5,10.5)
+	pictureframe7.rotation.y=0.5*Math.PI
+	
+	var light1 = BuildLight(-2,7,9,pictureframe1,irontexture)
+	var light2 = BuildLight(2,7,9,pictureframe2,irontexture)
+	var light3 = BuildLight(0,7,10.5,pictureframe3,irontexture)
+	var light4 = BuildLight(2,7,12,pictureframe4,irontexture)
+	var light5 = BuildLight(-1,7,12,pictureframe5,irontexture)
+	var light6 = BuildLight(-4,7,12,pictureframe6,irontexture)
+	var light7 = BuildLight(-4,7,9.5,pictureframe7,irontexture)
+	
+	var lightline1 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(lightline1)
+	lightline1.position.set(light1.position.x,light1.position.y+1,light1.position.z+0.2)
+	var lightline2 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(lightline2)
+	lightline2.position.set(light2.position.x,light2.position.y+1,light2.position.z+0.2)
+	var lightline3 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(lightline3)
+	lightline3.position.set(light3.position.x-0.2,light3.position.y+1,light3.position.z)
+	var lightline4 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(lightline4)
+	lightline4.position.set(light4.position.x,light4.position.y+1,light4.position.z-0.2)
+	var lightline5 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(lightline5)
+	lightline5.position.set(light5.position.x,light5.position.y+1,light5.position.z-0.2)
+	var lightline6 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(lightline6)
+	lightline6.position.set(light6.position.x,light6.position.y+1,light6.position.z-0.2)
+	var lightline7 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(lightline7)
+	lightline7.position.set(light7.position.x+0.2,light7.position.y+1,light7.position.z)
+	
+	pictureframe8 = new PictureFrame(2,3,aitouchipicture1,frametexture);
+	pictureframe8.position.set(-8.1,2.5,13)
+	pictureframe8.rotation.y=-0.5*Math.PI
+	pictureframe9 = new PictureFrame(2,3,aitouchipicture2,frametexture);
+	pictureframe9.position.set(-8.1,2.5,10)
+	pictureframe9.rotation.y=-0.5*Math.PI
+	pictureframe10 = new PictureFrame(2,3,aitouchipicture3,frametexture);
+	pictureframe10.position.set(-8.1,2.5,7)
+	pictureframe10.rotation.y=-0.5*Math.PI
+	pictureframe11 = new PictureFrame(3.5,4.5,aitouchipicture4,frametexture);
+	pictureframe11.position.set(-11.5,2.5,14.9)
+	pictureframe11.rotation.y=Math.PI
+	pictureframe12 = new PictureFrame(2,3,aitouchipicture5,frametexture);
+	pictureframe12.position.set(-14.9,2.5,2.5)
+	pictureframe12.rotation.y=0.5*Math.PI
+	pictureframe13 = new PictureFrame(5,3,aitouchipicture6,frametexture);
+	pictureframe13.position.set(-14.9,2.5,7.5)
+	pictureframe13.rotation.y=0.5*Math.PI
+	pictureframe14 = new PictureFrame(2,3,aitouchipicture7,frametexture);
+	pictureframe14.position.set(-14.9,2.5,12.5)
+	pictureframe14.rotation.y=0.5*Math.PI
+	
+	var light8 = BuildLight(-11,7,13,pictureframe8,irontexture)
+	var light9 = BuildLight(-11,7,10,pictureframe9,irontexture)
+	var light10 = BuildLight(-11,7,7,pictureframe10,irontexture)
+	var light11 = BuildLight(-11.5,7,10,pictureframe11,irontexture)
+	var light12 = BuildLight(-11,7,2.5,pictureframe12,irontexture)
+	var light13 = BuildLight(-11,7,7.5,pictureframe13,irontexture)
+	var light14 = BuildLight(-12,7,12.5,pictureframe14,irontexture)
+	
+	var lightline8 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(lightline8)
+	lightline8.position.set(light8.position.x-0.2,light8.position.y+1,light8.position.z)
+	var lightline9 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(lightline9)
+	lightline9.position.set(light9.position.x-0.2,light9.position.y+1,light9.position.z)
+	var lightline10 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(lightline10)
+	lightline10.position.set(light10.position.x-0.2,light10.position.y+1,light10.position.z)
+	var lightline11 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(lightline11)
+	lightline11.position.set(light11.position.x,light11.position.y+1,light11.position.z-0.2)
+	var lightline12 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(lightline12)
+	lightline12.position.set(light12.position.x+0.2,light12.position.y+1,light12.position.z)
+	var lightline13 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(lightline13)
+	lightline13.position.set(light13.position.x+0.2,light13.position.y+1,light13.position.z)
+	var lightline14 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(lightline14)
+	lightline14.position.set(light14.position.x+0.2,light14.position.y+1,light14.position.z)
+	
+	var line1 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,32,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(line1)
+	line1.position.set(4,9,0)
+	line1.rotation.z=-0.5*Math.PI
+	var line2 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,8,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(line2)
+	line2.position.set(-10.77,9,4)
+	line2.rotation.x=-0.5*Math.PI
+	var line3 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,13,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(line3)
+	line3.position.set(-11.17,9,6.5)
+	line3.rotation.x=-0.5*Math.PI
+	var line4 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,0.5,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(line4)
+	line4.position.set(-11.45,9,9.8)
+	line4.rotation.z=-0.5*Math.PI
+	var line5 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,1,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(line5)
+	line5.position.set(-11.7,9,12.5)
+	line5.rotation.z=-0.5*Math.PI
+	var line6 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,13,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(line6)
+	line6.position.set(-7.5,9,-1)
+	line6.rotation.x=-0.5*Math.PI
+	var line7 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,5.5,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(line7)
+	line7.position.set(4.5,9,2.75)
+	line7.rotation.x=-0.5*Math.PI
+	var line8 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,7.5,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(line8)
+	line8.position.set(8.5,9,-3.75)
+	line8.rotation.x=-0.5*Math.PI
+	var line9 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,12,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(line9)
+	line9.position.set(2,9,6)
+	line9.rotation.x=-0.5*Math.PI
+	var line10 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,6,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(line10)
+	line10.position.set(-1,9,11.8)
+	line10.rotation.z=-0.5*Math.PI
+	var line11 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,2.5,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(line11)
+	line11.position.set(0.75,9,10.5)
+	line11.rotation.z=-0.5*Math.PI
+	var line12 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,6,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(line12)
+	line12.position.set(-1,9,9.5)
+	line12.rotation.z=-0.5*Math.PI
+	var line13 = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,0.5,32,32), new THREE.MeshBasicMaterial({map:irontexture,side:THREE.DoubleSide}));
+	scene.add(line13)
+	line13.position.set(-2,9,9.25)
+	line13.rotation.x=-0.5*Math.PI
+	//LightGroup = [slight1,slight2,slight3,slight4,slight5,light1,light2,light3,light4,light5,light6,light7,light8,light9,light10,light11,light12,light13,light14]
+	LightGroup.forEach (function(item) {
+		item.power = 4;
+		}
+	 );
+}
+
+
+
+
+function animate() {
+  
+  
+  requestAnimationFrame(animate);
+  render();
+	
+}
+function render() {
+	
+	renderer.render(scene, camera);
+	
+}
+</script>
+</body>
+
+</html>
