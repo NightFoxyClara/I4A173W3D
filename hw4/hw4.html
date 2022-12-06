@@ -28,13 +28,19 @@
 <div style="float:left; margin-left: 10px; width:32vw;">
   <div>
     length value:
-    <input id="lradius" name="lradius" type="range" min=3 max=30 value=20>(notworking)
+    <input id="l" name="l" type="range" min=5 max=30 value=20>
+	<span id='lradiusPrint'>
+</span>
 	<br>
 	heigth value:
-    <input id="hradius" name="hradius" type="range" min=3 max=30 value=10>
+    <input id="h" name="h" type="range" min=5 max=30 value=10>
+	<span id='hradiusPrint'>
+</span>
 	<br>
 	weigth value:
-    <input id="wradius" name="wradius" type="range" min=3 max=30 value=10>
+    <input id="w" name="w" type="range" min=5 max=30 value=10>
+	<span id='wradiusPrint'>
+</span>
   </div>
   <br>
   <div style='background-color:yellow'>
@@ -62,6 +68,15 @@
 
 
 <script>
+$('#l').change(function() {
+  $('#lradiusPrint').text($(this).val());
+});
+$('#h').change(function() {
+  $('#hradiusPrint').text($(this).val());
+});
+$('#w').change(function() {
+  $('#wradiusPrint').text($(this).val());
+});
 $('.gclass').click(function() {
   if ($(this).val() === 'build'){
     cyl.visible=true
@@ -91,7 +106,7 @@ var pickplane;
 var cyl;
 var items = [];
 
-var woodtexture;
+var woodtexture, wood2texture;
 
 init();
 animate();
@@ -134,24 +149,24 @@ $('#restore').click(function() {
 
 function buildTable(l, h, w, pos) {
 
-  var mesh1 = new THREE.Mesh(new THREE.BoxGeometry(l,0.2*h,w), new THREE.MeshPhongMaterial({map:woodtexture,side:THREE.DoubleSide}));
+  var mesh1 = new THREE.Mesh(new THREE.BoxGeometry(l,0.2*h,w), new THREE.MeshPhongMaterial({map:wood2texture,side:THREE.DoubleSide}));
   scene.add(mesh1)
-  var mesh2 = new THREE.Mesh(new THREE.BoxGeometry(0.2*l,h,0.2*w), new THREE.MeshPhongMaterial({map:woodtexture,side:THREE.DoubleSide,transparent:true}));
+  var mesh2 = new THREE.Mesh(new THREE.BoxGeometry(0.2*l,h,0.2*w), new THREE.MeshPhongMaterial({map:wood2texture,side:THREE.DoubleSide,transparent:true}));
   mesh2.position.x+=0.5*l-0.2*l/2
   mesh2.position.z+=0.5*w-0.2*w/2
   mesh2.position.y-=0.5*h
   mesh1.add(mesh2)
-  var mesh3 = new THREE.Mesh(new THREE.BoxGeometry(0.2*l,h,0.2*w), new THREE.MeshPhongMaterial({map:woodtexture,side:THREE.DoubleSide,transparent:true}));
+  var mesh3 = new THREE.Mesh(new THREE.BoxGeometry(0.2*l,h,0.2*w), new THREE.MeshPhongMaterial({map:wood2texture,side:THREE.DoubleSide,transparent:true}));
   mesh3.position.x-=0.5*l-0.2*l/2
   mesh3.position.z+=0.5*w-0.2*w/2
   mesh3.position.y-=0.5*h
   mesh1.add(mesh3)
-  var mesh4 = new THREE.Mesh(new THREE.BoxGeometry(0.2*l,h,0.2*w), new THREE.MeshPhongMaterial({map:woodtexture,side:THREE.DoubleSide,transparent:true}));
+  var mesh4 = new THREE.Mesh(new THREE.BoxGeometry(0.2*l,h,0.2*w), new THREE.MeshPhongMaterial({map:wood2texture,side:THREE.DoubleSide,transparent:true}));
   mesh4.position.x+=0.5*l-0.2*l/2
   mesh4.position.z-=0.5*w-0.2*w/2
   mesh4.position.y-=0.5*h
   mesh1.add(mesh4)
-  var mesh5 = new THREE.Mesh(new THREE.BoxGeometry(0.2*l,h,0.2*w), new THREE.MeshPhongMaterial({map:woodtexture,side:THREE.DoubleSide,transparent:true}));
+  var mesh5 = new THREE.Mesh(new THREE.BoxGeometry(0.2*l,h,0.2*w), new THREE.MeshPhongMaterial({map:wood2texture,side:THREE.DoubleSide,transparent:true}));
   mesh5.position.x-=0.5*l-0.2*l/2
   mesh5.position.z-=0.5*w-0.2*w/2
   mesh5.position.y-=0.5*h
@@ -170,7 +185,7 @@ function buildTable(l, h, w, pos) {
 
   items.push(mesh1);
   mesh1.position.copy(pos);
-  mesh1.position.y+=h
+  mesh1.position.y=h
 }
 
 function buildChair(l, h, w, pos) {
@@ -199,7 +214,7 @@ function buildChair(l, h, w, pos) {
 
   items.push(mesh1);
   mesh1.position.copy(pos);
-  mesh1.position.y+=h;
+  mesh1.position.y=h
 
 }
 
@@ -260,10 +275,13 @@ function init() {
   var alphatexture = loader.load ('https://i.imgur.com/o7XPVGr.png');
   var alpha2texture = loader.load ('https://i.imgur.com/aO8OyxY.png');
   woodtexture = loader.load ('https://i.imgur.com/bS8hEbF.jpg');
+  wood2texture = loader.load ('https://i.imgur.com/RFsaLOV.jpg');
   var floor = new THREE.Mesh (new THREE.PlaneGeometry(200,200), new THREE.MeshPhongMaterial({map: grasstexture,side:THREE.DoubleSide,transparent:true,alphaMap: alphatexture}));
   var floor2 = new THREE.Mesh (new THREE.PlaneGeometry(200,200), new THREE.MeshPhongMaterial({map: marbletexture,side:THREE.DoubleSide,transparent:true,alphaMap: alpha2texture}));
   floor.rotation.x = -Math.PI/2;
   floor2.rotation.x = -Math.PI/2;
+  floor.position.y -= 0.01
+  floor2.position.y -= 0.01
   scene.add (floor);
   scene.add (floor2);
   
@@ -281,7 +299,7 @@ function onWindowResize() {
 
 function onDocumentMouseMove(event) {
 
-  event.preventDefault();
+  //event.preventDefault();
   if (!placing && thePuck === null) return;
   
   var viewportPos = $('#container').get(0).getBoundingClientRect();
@@ -306,7 +324,7 @@ function onDocumentMouseMove(event) {
 
 function onDocumentMouseDown(event) {
 
-  event.preventDefault();
+  //event.preventDefault();
 
   var viewportPos = $('#container').get(0).getBoundingClientRect();
   mouse.x = ((event.clientX - viewportPos.left) / $('#container').innerWidth()) * 2 - 1;
@@ -318,10 +336,10 @@ function onDocumentMouseDown(event) {
     if (placing === true){
 	  cyl.position.copy(intersects[0].point);
 	  if(type == "table"){
-	    buildTable(30, 10, 30, intersects[0].point);
+	    buildTable(document.getElementById('l').value, document.getElementById('h').value, document.getElementById('w').value, intersects[0].point);
 	  }
       else if(type == "chair"){
-	    buildChair(20, 10, 10, intersects[0].point);
+	    buildChair(document.getElementById('l').value, document.getElementById('h').value, document.getElementById('w').value, intersects[0].point);
 	  }
 	}
 	else if(deleting == true){
@@ -365,6 +383,9 @@ function animate() {
   else if (document.getElementById('table').checked) {
     type = document.getElementById('table').value;
   }
+  //document.getElementById("ol").innerHTML = document.getElementById('l').value;
+  //document.getElementById("oh").innerHTML = document.getElementById('h').value;
+  //document.getElementById("ow").innerHTML = document.getElementById('w').value;
   controls.update();
   requestAnimationFrame(animate);
   render();
