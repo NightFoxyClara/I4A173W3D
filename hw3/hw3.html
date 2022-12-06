@@ -22,7 +22,7 @@
 <body>
 
 <div id='info'><a href="https://i.imgur.com/d9JrSsQ.png">室內設計模型 (1)</a><br>
-<button id="power">Power</button>
+<button id="power">Turn off</button>
 <button id="mode">Change ViewPoint</button></div>
 <script src="https://threejs.org/build/three.min.js"></script>
 <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
@@ -37,12 +37,14 @@ $('#power').click (function() {
   powerOn = !powerOn;
   
   if (powerOn === true) {  // false--> true
+	 $("#power").text ('Turn off');
      LightGroup.forEach (function(item) {
 		item.power = 4;
 		}
 	 );
   }
   else{
+	$("#power").text ('Turn on');
 	LightGroup.forEach (function(item) {
 		item.power = 0;
 	}
