@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+	#info {
+		position: absolute;
+		top: 10px; width: 100%;
+		
+		padding: 5px;
+		text-align: center;
+		font-size: 20px;
+		color: #ffffff
+	} 
+	body {
+		overflow: hidden
+  }
+</style>
+
+
+</head>
+
+<body>
+<audio id="hitwall" style="display:none">
+<source src="./0231.wav" type='audio/wav'></audio>
+<h1 style="text-align:center"> Homework 5: not a node.js </h1>
+<hr>
+<div id="container" style="float:left; margin:3px; width:50vw; height:50vw">
+</div>
+
+<div style="float:left; margin-left: 10px; width:32vw;">
+  <div>
+    Circle-Radius:
+    <input id="r" name="r" type="range" min=1 max=30 value=1>
+	<span id='radiusPrint'>
+</span>
+  <hr>
+  Sound
+  <button id="sound">Turn on</button>
+
+<br>
+<h1 id="check">Collision!</h1>
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://threejs.org/build/three.min.js"></script>
+
+<script>
+var target = null
+var camera, scene, renderer;
+var circle, pos, vel;
+var powerOn = false;
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2();
+var pickplane;
+$('#r').change(function() {
+  $('#radiusPrint').text($(this).val());
+});
+$('#sound').click (function() {
+  powerOn = !powerOn;
+  if (powerOn === true) {  // false--> true
+	$("#sound").text ('Turn off');
+	hitWall.volume = 0.1;
+  }
+  else{
+	$("#sound").text ('Turn on');
+	hitWall.volume = 0;
+  }
+});
+init();
+animate();
+
+function init() {
+
+  var ww = $("#container").innerWidth();
+  var hh = $("#container").innerHeight();
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize(ww, hh);
+  renderer.setClearColor(0x888888);
+  $("#container").append(renderer.domElement);
+  
+  scene = new THREE.Scene();
+  camera = new THREE.OrthographicCamera(-100, 100, 100, -100, -10, 100);
+  camera.position.z = 50;
+  scene.add(camera);
+
+  ////////////////////////////////////////////////////////
+  var gridXZ = new THREE.GridHelper(200, 20, 'red', 'white');
+  gridXZ.rotation.x = Math.PI / 2;
+  scene.add(gridXZ);
+  window.addEventListener('resize', onWindowResize, false);
+  window.addEventListener('mousemove', onDocumentMouseMove, false);
+  window.addEventListener('mousedown', onDocumentMouseDown, false);
+  window.addEventListener('mouseup', onMouseUp, false);
+
+  let geometry = new THREE.BufferGeometry();
+  let points = [];
+  points.push(
+    new THREE.Vector3(-80, -80, 0),
+    new THREE.Vector3(80, -80, 0),
+    new THREE.Vector3(80, 80, 0),
+    new THREE.Vector3(-80, 80, 0),
+    new THREE.Vector3(-80, -80, 0));
+  geometry.setFromPoints(points);
+  var border = new THREE.Line(geometry, new THREE.LineBasicMaterial({
+    color: 'blue'
+  }));
+  scene.add(border);
+  box = new THREE.Mesh(new THREE.BoxGeometry(60, 30, 1), new THREE.MeshBasicMaterial({
+    color: 'cyan'
+  }));
+  circle = new THREE.Mesh(new THREE.CircleGeometry(document.getElementById('r').value, 20, 20), new THREE.MeshBasicMaterial({
+    color: 'yellow'
+  }));
+  scene.add(box);
+  scene.add(circle);
+  pos = new THREE.Vector3();
+  vel = new THREE.Vector3(10, -25);
+  
+  hitWall = document.getElementById('hitwall');
+  hitWall.volume = 0;
+  
+  pickable = new THREE.Mesh(new THREE.PlaneGeometry(100,100))
+  scene.add(pickable)
+  pickable.visible = false
+}
+
+function animate() {
+  var dt = 0.05;
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+  r = document.getElementById('r').value;
+  circle.scale.set(r, r, 1)
+  pos.add(vel.clone().multiplyScalar(dt));
+  if (pos.x > 80-r || pos.x < -(80-r))
+    if (pos.x > 80-r && vel.x > 0){
+		hitWall.play();
+        vel.x *= -1;
+	}
+	else if (pos.x < -(80-r) && vel.x < 0){
+		hitWall.play();
+	    vel.x *= -1;	
+	}
+	  
+  if (pos.y > 80-r || pos.y < -(80-r))
+    if (pos.y > 80-r && vel.y > 0){
+		hitWall.play();
+        vel.y *= -1;
+	}
+	else if (pos.y < -(80-r) && vel.y < 0){
+		hitWall.play();
+	    vel.y *= -1;
+	}
+  //pos.y = -10
+  //pos.x = -50
+  pos.z = 0.5
+  let Rmax = new THREE.Vector2( 0, 0 );
+  let Rmin = new THREE.Vector2( 0, 0 );
+  Rmax.x = box.position.x + 30 - circle.position.x
+  Rmax.y = box.position.y + 15 - circle.position.y
+  Rmin.x = box.position.x - 30 - circle.position.x
+  Rmin.y = box.position.y - 15 - circle.position.y
+  let check
+  if(Rmax.x < 0)
+	if(Rmax.y < 0)
+		if(Rmax.x*Rmax.x+Rmax.y*Rmax.y < r*r)
+			check = true
+	    else
+			check = false
+	else if(Rmin.y > 0)
+		if(Rmax.x*Rmax.x+Rmin.y*Rmin.y < r*r)
+			check = true
+	    else
+			check = false
+	else
+		if(Math.abs(Rmax.x) < r)
+			check = true
+	    else
+			check = false
+  else if(Rmin.x > 0)
+	if(Rmax.y < 0)
+		if(Rmin.x*Rmin.x+Rmax.y*Rmax.y < r*r)
+			check = true
+	    else
+			check = false
+	else if(Rmin.y > 0)
+		if(Rmin.x*Rmin.x+Rmin.y*Rmin.y < r*r)
+			check = true
+	    else
+			check = false
+	else
+		if(Math.abs(Rmin.x) < r)
+			check = true
+	    else
+			check = false
+  else
+	if(Rmax.y < 0)
+		if(Math.abs(Rmax.y) < r)
+			check = true
+	    else
+			check = false
+	else if(Rmin.y > 0)
+		if(Math.abs(Rmin.y) < r)
+			check = true
+	    else
+			check = false
+	else
+		check = true
+
+  if(check){
+	circle.material.color.set('green');
+	$("#check").text ('Collision!');
+  }
+  else{
+	circle.material.color.set('red');
+	$("#check").text ('No Collision!');
+  }
+  //$("#sound").text ('Turn off');
+  /*let Rmax = new THREE.Vector2( 0, 0 );
+  let Rmin = new THREE.Vector2( 0, 0 );
+  Rmax.x = box.position.x + 30
+  Rmax.y = box.position.y + 15
+  Rmin.x = box.position.x - 30
+  Rmin.y = box.position.y - 15
+  let RR = Math.sqrt((box.position.x - circle.position.x)*(box.position.x - circle.position.x) + (box.position.y - circle.position.y) * (box.position.y - circle.position.y))
+  if (box.position.x > circle.position.x){
+	if (box.position.y > circle.position.y){
+		if (Math.sqrt(Rmin.x*Rmin.x + Rmin.y*Rmin.y) > RR - r)
+			circle.material.color.set('green');	
+        else
+			circle.material.color.set('red');
+		
+	}
+	else if (box.position.y < circle.position.y){
+	    if (Math.sqrt(Rmin.x*Rmin.x + Rmax.y*Rmax.y) > RR - r)
+			circle.material.color.set('green');
+        else
+			circle.material.color.set('red');
+	}
+    else{
+	    if (Math.abs(Rmin.x) > RR - r)
+			circle.material.color.set('green');
+        else
+			circle.material.color.set('red');
+	}
+  }
+  else if (box.position.x < circle.position.x)
+    if (box.position.y > circle.position.y)
+	  if (Math.sqrt(Rmax.x*Rmax.x + Rmin.y*Rmin.y) > RR - r)
+		circle.material.color.set('green');
+      else
+	    circle.material.color.set('red');
+	else if (box.position.y < circle.position.y)
+	  if (Math.sqrt(Rmax.x*Rmax.x + Rmax.y*Rmax.y) > RR - r)
+		circle.material.color.set('green');
+      else
+	    circle.material.color.set('red');
+    else
+	  if (Rmax.x > RR-r)
+		circle.material.color.set('green');
+      else
+	    circle.material.color.set('red');
+  else
+    if (box.position.y > circle.position.y)
+	  if (Math.abs(Rmin.y) > RR-r)
+		circle.material.color.set('green');
+      else
+	    circle.material.color.set('red');
+	else if (box.position.y < circle.position.y)
+	  if (Rmax.y > RR-r)
+		circle.material.color.set('green');
+      else
+	    circle.material.color.set('red');
+    else
+		circle.material.color.set('green');*/
+  circle.position.copy(pos);
+}
+
+function onWindowResize() {
+  var ww = $("#container").innerWidth();
+  var hh = $("#container").innerHeight();
+
+  camera.aspect = ww / hh;
+  camera.updateProjectionMatrix();
+  renderer.setSize(ww, hh);
+}
+
+function onDocumentMouseDown(event) {
+  var viewportPos = $('#container').get(0).getBoundingClientRect();
+  mouse.x = ((event.clientX - viewportPos.left) / $('#container').innerWidth()) * 2 - 1;
+  mouse.y = -((event.clientY - viewportPos.top) / $('#container').innerHeight()) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  var intersects = raycaster.intersectObject(pickable);
+  if (intersects.length > 0) {
+			event.preventDefault();
+			target = box;
+  }
+}
+function onDocumentMouseMove(event) {
+
+  var viewportPos = $('#container').get(0).getBoundingClientRect();
+  mouse.x = ((event.clientX - viewportPos.left) / $('#container').innerWidth()) * 2 - 1;
+  mouse.y = -((event.clientY - viewportPos.top) / $('#container').innerHeight()) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+	
+	var intersects = raycaster.intersectObject(pickable);
+	if (intersects.length > 0) {
+		
+		event.preventDefault();
+		if(target !== null){
+			target.position.copy(intersects[0].point);
+		}
+			
+  }
+}
+function onMouseUp(event) {
+	target = null;
+}
+
+</script>
+</body>
+
+</html>
